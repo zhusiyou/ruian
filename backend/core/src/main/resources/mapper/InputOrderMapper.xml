@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ruian.core.mapper.InputOrderMapper">
+
+    <insert id="add" parameterType="InputOrder">
+        insert into rui_input_order (id, input_code, store_manager, insert_user_id, input_date, supplier_id, create_time, amount, remark, version)
+        values(#{id}, #{inputCode}, #{storeManager}, #{insertUserId}, #{inputDate}, #{supplierId}, now(), #{amount}, #{remark}, 0)
+    </insert>
+
+    <update id="update" parameterType="InputOrder">
+        update rui_input_order set input_code=#{inputCode}, store_manager=#{storeManager},
+        input_date=#{inputDate}, supplier_id=#{supplierId}, amount=#{amount}, remark=#{remark}, version=version+1
+        where id=#{id} and version=#{version}
+    </update>
+
+    <select id="find" resultType="InputOrder">
+        select t1.*, t2.company_name from rui_input_order t1
+        left join rui_customer t2 on t1.supplier_id = t2.id
+        where 1=1
+        <if test="query.inputCode != null and query.inputCode != ''">
+            and t1.input_code  like concat('%', #{query.inputCode}, '%')
+        </if>
+        <if test="query.id != null and query.id != ''">
+            and t1.id = #{query.id}
+        </if>
+        limit #{page.startIndex}, #{page.pageSize}
+    </select>
+
+    <select id="findCount" resultType="Integer">
+        select count(1) from rui_input_order t1
+        where 1=1
+        <if test="query.inputCode != null and query.inputCode != ''">
+            and t1.input_code  like concat('%', #{query.inputCode}, '%')
+        </if>
+    </select>
+</mapper>

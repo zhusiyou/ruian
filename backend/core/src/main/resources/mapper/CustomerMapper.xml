@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ruian.core.mapper.CustomerMapper">
+    <select id="findAll" resultType="Customer">
+        SELECT t1.* FROM rui_customer t1
+    </select>
+
+    <insert id="add" parameterType="Customer">
+        insert into rui_customer (id, company_name, address, linkman, telephone, remark) values
+        (uuid(), #{companyName}, #{address}, #{linkman}, #{telephone}, #{remark})
+    </insert>
+
+    <update id="update" parameterType="Customer">
+        update rui_customer set company_name=#{companyName}, address=#{address},
+        linkman=#{linkman}, telephone=#{telephone}, remark=#{remark}
+        where id=#{id}
+    </update>
+</mapper>

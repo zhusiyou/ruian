@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ruian.core.mapper.InputDetailMapper">
+    <insert id="add" parameterType="InputDetail">
+        insert into rui_input_detail (id, input_id, product_id, price, count, store_no, amount)
+        values (uuid(), #{inputId}, #{productId}, #{price}, #{count}, #{storeNo}, #{amount})
+    </insert>
+
+    <delete id="delete" parameterType="String">
+        delete from rui_input_detail where id = #{id}
+    </delete>
+
+    <update id="update" parameterType="InputDetail">
+        update rui_input_detail set product_id=#{productId}, price=#{price}, count=#{count},
+        store_no=#{storeNo}, amount=#{amount} where id=#{id}
+    </update>
+
+    <select id="findByInputId" resultType="InputDetail">
+        select t1.*, t2.product_name, '' as status from rui_input_detail t1
+        join rui_product t2 on t1.product_id = t2.id
+        where t1.input_id = #{inputId}
+    </select>
+
+    <select id="findById" resultType="InputDetail">
+        select t1.*, t2.product_name, '' as status from rui_input_detail t1
+        join rui_product t2 on t1.product_id = t2.id
+        where t1.id = #{id}
+    </select>
+</mapper>

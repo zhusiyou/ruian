@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ruian.core.mapper.InputDetailChangeRecordMapper">
+    <insert id="add" parameterType="InputDetailChangeRecord">
+        insert into rui_input_detail_change_record (id, input_order_id, product_id, price, count, store_no, input_detail_id, status, user_id, create_time, input_order_version)
+        values (uuid(), #{inputOrderId}, #{productId}, #{price}, #{count}, #{storeNo}, #{inputDetailId}, #{status}, #{userId}, now(), #{inputOrderVersion})
+    </insert>
+
+
+</mapper>
