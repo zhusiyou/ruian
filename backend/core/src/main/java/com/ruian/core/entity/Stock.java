@@ -15,4 +15,7 @@ public class Stock {
     private Double count;
     private Double inputPrice;
     private Double amount;
+
+    private String productName;
+    private String unit;
 }

@@ -4,9 +4,14 @@ export function save(product){
     return service.post('/product/save', product)
 }
 
-export function page(productQuery){
-    // console.log(productQuery)
-    return service.get(`/product/page?name=${productQuery.name}&pageIndex=${productQuery.pageIndex}&pageSize=${productQuery.pageSize}`)
+export function page(queryParam){
+    const query = {
+        name: '',
+        pageIndex: 1,
+        pageSize: 2
+    }
+    Object.assign(query, queryParam)
+    return service.get(`/product/page?name=${query.name}&pageIndex=${query.pageIndex}&pageSize=${query.pageSize}`)
 }
 
 export function select(txt){

@@ -62,7 +62,7 @@ public class ProductServiceImpl implements ProductService {
             Sheet sheet = wb.getSheetAt(0);
             int rowCount = sheet.getLastRowNum();
             DataFormatter formatter = new DataFormatter();
-            for (int i = 1; i < rowCount; i++) {
+            for (int i = 1; i <= rowCount; i++) {
                 Row row = sheet.getRow(i);
 
                 Cell cell = row.getCell(0);

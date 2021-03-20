@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ruian.core.mapper.StockMapper">
+    <select id="getExportData" resultType="Stock">
+        SELECT
+        t2.id,
+        t2.store_no,
+        t1.unit,
+        IFNULL(t2.count, 0) AS count,
+        IFNULL(t2.input_price, 0) AS input_price,
+        IFNULL(t2.amount, 0) AS amount,
+        t1.id AS product_id,
+        t1.product_name
+        FROM rui_product t1
+        LEFT JOIN rui_stock t2 ON t1.id = t2.product_id
+    </select>
+    <insert id="add" parameterType="Stock">
+        insert into rui_stock(id, product_id, store_no, count, input_price, amount)
+        values(uuid(), #{productId}, #{storeNo}, #{count}, #{inputPrice}, #{amount})
+    </insert>
+    <delete id="empty">
+        delete from rui_stock where id != ''
+    </delete>
+    <select id="find" resultType="Stock">
+        SELECT
+        t2.id,
+        t2.store_no,
+        t1.unit,
+        IFNULL(t2.count, 0) AS count,
+        IFNULL(t2.input_price, 0) AS input_price,
+        IFNULL(t2.amount, 0) AS amount,
+        t1.id AS product_id,
+        t1.product_name
+        FROM rui_stock t2
+        left JOIN rui_product t1 ON t1.id = t2.product_id
+        where 1=1
+        <if test="query.productName != null and query.productName !=''">
+            and t1.product_name like concat('%', #{query.productName}, '%')
+        </if>
+        order by t1.product_name
+        limit #{page.startIndex}, #{page.pageSize}
+    </select>
+    <select id="findCount" resultType="Integer">
+        SELECT
+        count(1)
+        FROM rui_stock t2
+        left JOIN rui_product t1 ON t1.id = t2.product_id
+        where 1=1
+        <if test="query.productName != null and query.productName !=''">
+            and t1.product_name like concat('%', #{query.productName}, '%')
+        </if>
+    </select>
+
+</mapper>

@@ -35,7 +35,7 @@ public class ProductController {
 
     @GetMapping("/page")
     public PageResult<Product> find(@RequestParam(name = "name", required = false) String productName,
-                                    @RequestParam(name = "pageIndex", defaultValue = "0") int pageIndex,
+                                    @RequestParam(name = "pageIndex", defaultValue = "1") int pageIndex,
                                     @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
         ProductQuery query = new ProductQuery();
         query.setName(productName);

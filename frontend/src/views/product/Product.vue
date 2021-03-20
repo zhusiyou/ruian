@@ -25,7 +25,7 @@
     <!-- <a-divider /> -->
     <a-table
       :columns="columns"
-      :data-source="ds"
+      :data-source="dataSource"
       :pagination="pagination"
       @change="handleTableChange"
       :loading="loading"
@@ -42,7 +42,7 @@
 <script>
 import AddProductBtn from "@/components/AddProductBtn.vue";
 import { page } from "@/api/product";
-import { computed, reactive, ref } from "vue";
+import { computed, reactive } from "vue";
 import { usePagination } from "vue-request";
 
 const columns = [
@@ -91,11 +91,10 @@ export default {
       productName: "",
     });
 
-    const ds = ref([]);
     const defaultPageSize = 10;
     // const handleUpload = ()=>{}
     const {
-      // data: dataSource,
+      data,
       run,
       loading,
       current,
@@ -106,12 +105,17 @@ export default {
       pagination: {
         currentKey: "pageIndex",
         pageSizeKey: "pageSize",
-        totalKey: "total",
+        // totalKey: "total",
       },
-      defaultParams: [{ name: form.productName, pageIndex: 1, pageSize: defaultPageSize }],
-      onSuccess: (data) => (ds.value = data.data),
+      // defaultParams: [{ name: form.productName, pageIndex: 1, pageSize: defaultPageSize }],
+      // onSuccess: (data) => (ds.value = data.data),
     });
-
+    const dataSource = computed(()=>{
+     if(data.value){
+       return data.value.data;
+     }
+     return []
+   })
     const pagination = computed(() => ({
       total: total.value,
       current: current.value,
@@ -131,7 +135,7 @@ export default {
     };
 
     return {
-      ds,
+      dataSource,
       columns,
       form,
       handleTableChange,

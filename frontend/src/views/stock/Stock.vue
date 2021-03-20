@@ -1,95 +1,61 @@
 <template>
   <div>
     <a-form layout="inline" :model="form">
-      <a-form-item label="商品分类">
-        <a-select
-          style="width: 120px"
-          @focus="focus"
-          ref="select"
-          @change="handleChange"
-        >
-          <a-select-option value="jack">药品</a-select-option>
-          <a-select-option value="lucy">低值易耗品</a-select-option>
-        </a-select>
+      <a-form-item>
+        <a-input v-model:value="form.productName" placeholder="商品名称" />
       </a-form-item>
       <a-form-item>
-        <a-input v-model="form.fieldB" placeholder="商品名称" />
-      </a-form-item>
-      <a-form-item>
-        <a-button type="primary"> 查询 </a-button>
+        <a-button type="primary" @click="search"> 查询 </a-button>
       </a-form-item>
       <a-form-item>
         <a-button @click="exportStock">导出库存</a-button>
-        <!-- <a href="http://localhost:8181/product/export" target="_blank">导出库存</a> -->
+      </a-form-item>
+      <a-form-item>
+        <a-upload name="file" action="http://localhost:8181/stock/upload">
+          <a-button>
+            <!-- <upload-outlined></upload-outlined> -->
+            初始化库存数据
+          </a-button>
+        </a-upload>
       </a-form-item>
     </a-form>
 
-    <a-table :columns="columns" :data-source="dataSource" size="small" bordered>
-      <template
-        v-for="col in ['name', 'age', 'address']"
-        #[col]="{ text, record }"
-        :key="col"
-      >
-        <div>
-          <a-input
-            v-if="editableData[record.key]"
-            v-model:value="editableData[record.key][col]"
-            style="margin: -5px 0"
-          />
-          <template v-else>
-            {{ text }}
-          </template>
-        </div>
-      </template>
-      <template #operation="{ record }">
-        <div class="editable-row-operations">
-          <span v-if="editableData[record.key]">
-            <a @click="save(record.key)">Save</a>
-            <a-popconfirm title="Sure to cancel?" @confirm="cancel(record.key)">
-              <a>Cancel</a>
-            </a-popconfirm>
-          </span>
-          <span v-else>
-            <a @click="edit(record.key)">Edit</a>
-          </span>
-        </div>
-      </template>
+    <a-table
+      :columns="columns"
+      :data-source="dataSource"
+      :pagination="pagination"
+      @change="handleTableChange"
+      :loading="loading"
+      rowKey="id"
+      size="small"
+      bordered
+    >
     </a-table>
   </div>
 </template>
 <script>
-// import { DownOutlined } from '@ant-design/icons-vue';
-import { cloneDeep } from "lodash-es";
-import { reactive, ref } from "vue";
-import {exportStock} from '@/api/stock'
-const form = {
-  fieldA: "",
-  fieldB: "",
-};
+import { reactive, computed, defineComponent  } from "vue";
+import { exportStock, page } from "@/api/stock";
+import { usePagination } from "vue-request";
+const form = reactive({
+  productName: "",
+});
 const columns = [
   {
-    title: "编号",
-    dataIndex: "productCode",
-    width: "25%",
-    slots: { customRender: "productCode" },
-  },
-  {
     title: "商品名称",
-    dataIndex: "name",
+    dataIndex: "productName",
     width: "25%",
-    slots: { customRender: "name" },
+    slots: { customRender: "productName" },
   },
   {
     title: "单位",
     dataIndex: "unit",
-    width: "15%",
     slots: { customRender: "unit" },
   },
   {
     title: "均价",
-    dataIndex: "price",
-    width: "20%",
-    slots: { customRender: "price" },
+    dataIndex: "inputPrice",
+    slots: { customRender: "inputPrice" },
   },
   {
     title: "库存",
@@ -97,56 +63,65 @@ const columns = [
     width: "20%",
     slots: { customRender: "count" },
   },
-  {
-    title: "操作",
-    dataIndex: "operation",
-    slots: { customRender: "operation" },
-  },
+  // {
+  //   title: "操作",
+  //   dataIndex: "operation",
+  //   slots: { customRender: "operation" },
+  // },
 ];
-let data = [];
-for (let i = 0; i < 30; i++) {
-  data.push({
-    key: i.toString(),
-    name: "畜用VC-"+(200+i*20).toString() + "ml",
-    unit: "个",
-    productCode: `no. ${i}`,
-    price: 200+i,
-    count: 100
-  });
-}
-export default {
+export default defineComponent({
   setup() {
-    const dataSource = ref(data);
-    const editableData = reactive({});
 
-    const edit = (key) => {
-      editableData[key] = cloneDeep(
-        dataSource.value.filter((item) => key === item.key)[0]
-      );
+    const { data, run, loading, current, pageSize, total, changePageSize } = usePagination(page, {
+      formatResult: (res) => res.data,
+      pagination: {
+        currentKey: "pageIndex",
+        pageSizeKey: "pageSize",
+        totalKey: "total",
+      },
+      defaultParams: [form],
+    });
+    changePageSize(2)
+
+   const dataSource = computed(()=>{
+     if(data.value){
+       return data.value.data;
+     }
+     return []
+   })
+
+    const pagination = computed(() => {
+      return {
+        total: total.value,
+        current: current.value,
+        pageSize: pageSize.value,
+      };
+    });
+
+    const search = () => run(form);
+
+    const handleTableChange = function (pag) {
+      run({
+        productName: form.productName,
+        pageIndex: pag?.current,
+        pageSize: pag.pageSize,
+      });
     };
-    const save = (key) => {
-      Object.assign(
-        dataSource.value.filter((item) => key === item.key)[0],
-        editableData[key]
-      );
-      delete editableData[key];
-    };
-    const cancel = (key) => {
-      delete editableData[key];
-    };
+
+
+
     return {
       dataSource,
       columns,
-      editingKey: "",
-      editableData,
-      edit,
-      save,
-      cancel,
       form,
       exportStock,
+      pagination,
+      loading,
+      search,
+      handleTableChange,
     };
   },
-};
+});
 </script>
 <style scoped>
 .editable-row-operations a {
