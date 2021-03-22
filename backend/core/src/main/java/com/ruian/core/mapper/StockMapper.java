@@ -18,4 +18,7 @@ public interface StockMapper {
     int empty();
     List<Stock> find(@Param("query") StockQuery query, @Param("page") Pageable page);
     Integer findCount(@Param("query") StockQuery query);
+    Integer exists(String productId);
+    Stock findByProductId(String productId);
+    int update(Stock stock);
 }

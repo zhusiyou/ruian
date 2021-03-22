@@ -12,7 +12,11 @@
         <a-button type="primary"> 查询 </a-button>
       </a-form-item>
       <a-form-item>
-        <a-button> 导入盘库数据 </a-button>
+        <a-upload name="file" action="http://localhost:8181/taking/upload">
+          <a-button>
+            上传盘库数据
+          </a-button>
+        </a-upload>
       </a-form-item>
       <a-form-item>
         <a-button> 新增盘库数据 </a-button>

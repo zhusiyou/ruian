@@ -1,5 +1,7 @@
 package com.ruian.core.service.impl;
 
+import cn.hutool.core.util.NumberUtil;
+import com.ruian.core.entity.InputDetail;
 import com.ruian.core.entity.Stock;
 import com.ruian.core.mapper.StockMapper;
 import com.ruian.core.model.PageResult;
@@ -125,5 +127,54 @@ public class StockServiceImpl implements StockService {
         }
 
         return false;
+    }
+
+    @Override
+    public boolean update(InputDetail before, InputDetail after) throws Exception {
+        String productId = before==null?after.getProductId():before.getProductId();
+        boolean result = true;
+        if(before!=null){
+         Stock stock = mapper.findByProductId(productId);
+         stock.setCount(stock.getCount() - before.getCount());
+         stock.setAmount(stock.getAmount() - before.getAmount());
+         if(stock.getCount()==0 || stock.getAmount()==0){
+             stock.setInputPrice(0D);
+         }else{
+             stock.setInputPrice(NumberUtil.div(stock.getAmount(), stock.getCount(), 2));
+         }
+         result = result && mapper.update(stock)>0;
+        }
+
+        if(after!=null){
+            if(!exists(productId)){
+                Stock stock = new Stock();
+                stock.setInputPrice(after.getPrice());
+                stock.setCount(after.getCount());
+                stock.setAmount(after.getAmount());
+                stock.setStoreNo(after.getStoreNo());
+                stock.setProductId(productId);
+
+                result  = result && mapper.add(stock)>0;
+            }else{
+                Stock stock = mapper.findByProductId(productId);
+                stock.setCount(stock.getCount() + after.getCount());
+                stock.setAmount(stock.getAmount() + after.getAmount());
+                if(stock.getCount()==0 || stock.getAmount()==0){
+                    stock.setInputPrice(0D);
+                }else{
+                    stock.setInputPrice(NumberUtil.div(stock.getAmount(), stock.getCount(), 2));
+                }
+                result = result && mapper.update(stock)>0;
+            }
+
+        }
+        if(!result){
+            throw new Exception("计算库存时出错");
+        }
+        return result;
+    }
+
+    private boolean exists(String productId){
+        return mapper.exists(productId)>0;
     }
 }

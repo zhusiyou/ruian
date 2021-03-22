@@ -12,6 +12,7 @@ import com.ruian.core.model.InputOrderQuery;
 import com.ruian.core.model.PageResult;
 import com.ruian.core.model.Pageable;
 import com.ruian.core.service.InputOrderService;
+import com.ruian.core.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,9 @@ public class InputOrderServiceImpl implements InputOrderService {
 
     @Autowired
     private InputDetailChangeRecordMapper recordMapper;
+
+    @Autowired
+    private StockService stockService;
 
     @Override
     public PageResult<InputOrder> page(Pageable page) {
@@ -78,10 +82,11 @@ public class InputOrderServiceImpl implements InputOrderService {
         if(rst != 1){
             throw new Exception("入库单保存时出现错误");
         }
-        entity.getDetails().stream().forEach(item->{
+        for (InputDetail item : entity.getDetails()) {
             item.setInputId(id);
             detailMapper.add(item);
-        });
+            stockService.update(null, item);
+        }
         return true;
     }
 
@@ -95,11 +100,12 @@ public class InputOrderServiceImpl implements InputOrderService {
         if(rst != 1){
             throw new Exception("数据已过期");
         }
-        entity.getDetails().stream().forEach(item->{
-            if(item.getStatus().equals(ADDED)){
+        for (InputDetail item : entity.getDetails()) {
+            if (item.getStatus().equals(ADDED)) {
                 item.setInputId(entity.getId());
                 detailMapper.add(item);
-            }else if(item.getStatus().equals(UPDATED) || item.getStatus().equals(DELETED)) {
+                stockService.update(null, item);
+            } else if (item.getStatus().equals(UPDATED) || item.getStatus().equals(DELETED)) {
                 InputDetailChangeRecord record = new InputDetailChangeRecord();
                 InputDetail detail = detailMapper.findById(item.getId());
 
@@ -116,15 +122,17 @@ public class InputOrderServiceImpl implements InputOrderService {
 
                 recordMapper.add(record);
 
-                if(item.getStatus().equals(UPDATED)){
+                if (item.getStatus().equals(UPDATED)) {
                     detailMapper.update(item);
-                }else{
+                    stockService.update(detail, item);
+                } else {
                     detailMapper.delete(item.getId());
+                    stockService.update(item, null);
                 }
             }
 
-            //TODO: 操作库存
-        });
+            //TODO: 操作应付
+        }
         return true;
     }
 }

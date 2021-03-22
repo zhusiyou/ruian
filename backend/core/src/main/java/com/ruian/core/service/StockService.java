@@ -1,5 +1,6 @@
 package com.ruian.core.service;
 
+import com.ruian.core.entity.InputDetail;
 import com.ruian.core.entity.Stock;
 import com.ruian.core.model.PageResult;
 import com.ruian.core.model.Pageable;
@@ -16,4 +17,12 @@ public interface StockService {
     PageResult<Stock> find(StockQuery query, Pageable page);
     Workbook getExportExcel();
     boolean initFromExcel(MultipartFile file);
+
+    /**
+     * 处理修改入库单时引起的库存变更
+     * @param before 修改前的商品入库信息，新增时为null
+     * @param after 修改后的商品入库信息，删除时为null
+     * @return
+     */
+    boolean update(InputDetail before, InputDetail after) throws Exception;
 }

@@ -50,5 +50,13 @@
             and t1.product_name like concat('%', #{query.productName}, '%')
         </if>
     </select>
-
+    <select id="exists" resultType="Integer">
+        select count(1) from rui_stock where product_id = #{productId}
+    </select>
+    <select id="findByProductId" resultType="Stock">
+        select * from rui_stock where product_id = #{productId}
+    </select>
+    <update id="update" parameterType="Stock">
+        update rui_stock set count=#{count}, input_price=#{inputPrice}, amount=#{amount} where id = #{id}
+    </update>
 </mapper>
