@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ruian.core.mapper.StockMonthMapper">
+    <select id="findAll" resultType="StockMonth">
+        SELECT
+            t1.id,
+            t1.product_name,
+            ifnull(t4.balance_count, 0) as balance_count,
+            ifnull(t4.balance_amount, 0) as balance_amount,
+            ifnull(t4.balance_price, 0) as balance_price,
+            ifnull(t2.input_count, 0) as input_count,
+            ifnull(t2.input_amount, 0) as input_amount,
+            ifnull(t3.after_count, 0) as after_count
+        FROM
+            rui_product t1
+        left join (
+            select product_id, sum(d.count) as input_count, sum(d.amount) as input_amount
+            from rui_input_detail d
+            join rui_input_order o on d.input_id = o.id
+            where year(o.input_date)  = #{year} and month(o.input_date) = #{month}
+            group by product_id
+        ) as t2/*本月购入*/ on t2.product_id = t1.id
+        left join (
+            select product_id, count as after_count
+            from rui_stock_taking
+            where year=#{year} and month= #{month}
+        ) as t3/*本月结存--盘点数据*/ on t3.product_id = t1.id
+        left join (
+            select m.product_id,
+            m.after_count as balance_count,
+            m.after_amount as balance_amount,
+            m.after_price as balance_price
+            from rui_stock_month m
+            where year=#{lastYear} and month=#{lastMonth}
+        ) as t4/*上月结存*/ on t4.product_id = t1.id
+    </select>
+    <insert id="add" parameterType="StockMonth">
+        INSERT INTO `rui_stock_month`
+        (`id`,
+        `year`,
+        `month`,
+        `product_id`,
+        `product_name`,
+        `balance_count`,
+        `balance_amount`,
+        `balance_price`,
+        `input_count`,
+        `input_amount`,
+        `input_price`,
+        `before_count`,
+        `before_amount`,
+        `before_price`,
+        `cost_count`,
+        `cost_amount`,
+        `cost_price`,
+        `after_count`,
+        `after_amount`,
+        `after_price`)
+        VALUES(
+          uuid(),
+          #{year},
+          #{month},
+          #{productId},
+          #{productName},
+          #{balanceCount},
+          #{balanceAmount},
+          #{balancePrice},
+          #{inputCount},
+          #{inputAmount},
+          #{inputPrice},
+          #{beforeCount},
+          #{beforeAmount},
+          #{beforePrice},
+          #{costCount},
+          #{costAmount},
+          #{costPrice},
+          #{afterCount},
+          #{afterAmount},
+          #{afterPrice}
+        )
+    </insert>
+</mapper>

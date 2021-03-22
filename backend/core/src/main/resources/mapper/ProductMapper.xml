@@ -20,6 +20,9 @@
             and t1.product_name  like concat('%', #{query.name}, '%')
         </if>
     </select>
+    <select id="findByName" resultType="Product">
+        select * from rui_product where product_name = #{productName}
+    </select>
 
     <insert id="add" parameterType="Product">
         insert into rui_product (id, category_id,product_name, unit, bar_code, product_code, default_price, remark, create_time) values

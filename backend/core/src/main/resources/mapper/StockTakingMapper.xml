@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ruian.core.mapper.StockTakingMapper">
+
+    <insert id="add" parameterType="StockTaking">
+        insert into rui_stock_taking(id, year, month, product_id, product_name, count)
+        values(uuid(), #{year}, #{month}, #{productId}, #{productName}, #{count})
+    </insert>
+    <delete id="delete">
+        delete from rui_stock_taking where year=#{year} and month =#{month}
+    </delete>
+</mapper>

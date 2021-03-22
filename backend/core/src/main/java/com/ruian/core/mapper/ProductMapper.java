@@ -17,4 +17,5 @@ public interface ProductMapper {
     Integer findCount(@Param("query") ProductQuery query);
     int add(Product product);
     int update(Product product);
+    Product findByName(String productName);
 }

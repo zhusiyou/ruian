@@ -57,7 +57,7 @@ public class StockServiceImpl implements StockService {
         row.createCell(3).setCellValue("数量");
         row.createCell(4).setCellValue("单价");
         row.createCell(5).setCellValue("金额");
-        row.createCell(6).setCellValue("库房");
+//        row.createCell(6).setCellValue("库房");
 
         int rowNumber = 1;
         for (Stock item: list
@@ -69,7 +69,7 @@ public class StockServiceImpl implements StockService {
             row.createCell(3).setCellValue(item.getCount());
             row.createCell(4).setCellValue(item.getInputPrice());
             row.createCell(5).setCellValue(item.getAmount());
-            row.createCell(6).setCellValue(item.getStoreNo());
+//            row.createCell(6).setCellValue(item.getStoreNo());
             rowNumber++;
         }
 
@@ -108,14 +108,14 @@ public class StockServiceImpl implements StockService {
                     price = cell.getNumericCellValue();
                 }
                 Double amount = Double.parseDouble(formatter.formatCellValue(row.getCell(5)));
-                String storeNo = formatter.formatCellValue(row.getCell(6));
+//                String storeNo = formatter.formatCellValue(row.getCell(6));
 
                 Stock stock = new Stock();
                 stock.setAmount(amount);
                 stock.setCount(count);
                 stock.setInputPrice(price);
                 stock.setProductId(productId);
-                stock.setStoreNo(storeNo);
+//                stock.setStoreNo(storeNo);
 
                 mapper.add(stock);
             }
