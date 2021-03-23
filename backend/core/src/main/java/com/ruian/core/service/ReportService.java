@@ -11,5 +11,5 @@ public interface ReportService {
     /**
      * 校正库存
      */
-    void resetStock();
+    String resetStock(Integer year, Integer month);
 }

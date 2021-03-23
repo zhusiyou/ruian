@@ -47,9 +47,9 @@ const routes = [
                 component: ()=> import('../views/report/Income.vue')
             },
             {
-                path: 'expend',
-                name: 'expend',
-                component: ()=> import('../views/report/Expend.vue')
+                path: 'cost',
+                name: 'cost',
+                component: ()=> import('../views/report/Cost.vue')
             }
         ]
     },    

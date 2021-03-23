@@ -1,6 +1,7 @@
 package com.ruian.core.mapper;
 
 import com.ruian.core.entity.StockTaking;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * @author: zhudawei
@@ -9,5 +10,5 @@ import com.ruian.core.entity.StockTaking;
  */
 public interface StockTakingMapper {
     int add(StockTaking entity);
-    int delete(Integer year, Integer month);
+    int delete(@Param("year") Integer year, @Param("month") Integer month);
 }

@@ -4,15 +4,14 @@ import com.ruian.core.entity.Stock;
 import com.ruian.core.model.PageResult;
 import com.ruian.core.model.Pageable;
 import com.ruian.core.model.StockQuery;
+import com.ruian.core.service.ReportService;
 import com.ruian.core.service.StockService;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -26,6 +25,8 @@ import java.io.OutputStream;
 public class StockController {
     @Autowired
     private StockService service;
+    @Autowired
+    private ReportService reportService;
 
     @GetMapping("/export")
     public void export(HttpServletResponse response){
@@ -60,5 +61,23 @@ public class StockController {
         pageable.setPageSize(pageSize);
 
         return service.find(query, pageable);
+    }
+
+    @PostMapping("/reset")
+    public String reset(@RequestParam("date") String date){
+        String[] arr = date.split("-");
+        Integer year = Integer.parseInt(arr[0]);
+        Integer month = Integer.parseInt(arr[1]);
+
+        return reportService.resetStock(year, month);
+    }
+
+    @GetMapping("/cost")
+    public boolean cost(@RequestParam("date") String date){
+        String[] arr = date.split("-");
+        Integer year = Integer.parseInt(arr[0]);
+        Integer month = Integer.parseInt(arr[1]);
+        reportService.generateStockMonth(year, month);
+        return true;
     }
 }

@@ -3,7 +3,7 @@
 <mapper namespace="com.ruian.core.mapper.StockMonthMapper">
     <select id="findAll" resultType="StockMonth">
         SELECT
-            t1.id,
+            t1.id as product_id,
             t1.product_name,
             ifnull(t4.balance_count, 0) as balance_count,
             ifnull(t4.balance_amount, 0) as balance_amount,
@@ -79,4 +79,22 @@
           #{afterPrice}
         )
     </insert>
+    <!-- 库存数after_与结算数before_不一致的数据-->
+    <select id="findErrorData" resultType="StockMonth">
+        select * from (
+            SELECT
+                t1.id as product_id,
+                t1.product_name,
+                ifnull(t4.before_count, 0) as before_count,
+                ifnull(t4.before_amount, 0) as before_amount,
+                ifnull(t2.count, 0) as after_count,
+                ifnull(t2.amount, 0) as after_amount
+            FROM
+                rui_product t1
+            left join rui_stock as t2 on t2.product_id = t1.id
+            left join rui_stock_month as t4 on t4.product_id = t1.id and t4.year=#{year} and t4.month=#{month}
+            ) as t
+            where before_count != after_count or before_amount != after_amount
+    </select>
+
 </mapper>

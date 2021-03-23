@@ -17,3 +17,11 @@ export function page(queryParam){
     Object.assign(query, queryParam)
     return service.get(`/stock/page?productName=${query.productName}&pageIndex=${query.pageIndex}&pageSize=${query.pageSize}`)
 }
+
+export function reset(queryParam){
+    return service.post("/stock/reset?date=" + queryParam.date)
+}
+
+export function cost(queryParam){
+    return service.get("/stock/cost?date=" + queryParam.date)
+}

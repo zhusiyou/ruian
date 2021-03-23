@@ -6,6 +6,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.ruian.core.entity.StockMonth;
+import com.ruian.core.mapper.StockMapper;
 import com.ruian.core.mapper.StockMonthMapper;
 import com.ruian.core.service.ReportService;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author: zhudawei
@@ -27,6 +29,9 @@ public class ReportServiceImpl implements ReportService {
 
     @Autowired
     private StockMonthMapper stockMonthMapper;
+
+    @Autowired
+    private StockMapper stockMapper;
 
     @Override
     public void generateStockMonth(Integer year, Integer month) {
@@ -45,13 +50,16 @@ public class ReportServiceImpl implements ReportService {
             item.setBeforeAmount(item.getBalanceAmount() + item.getInputAmount());
             if(item.getBeforeCount()==0 || item.getBeforeAmount()==0){
                 item.setBeforePrice(0D);
+            }else{
+                item.setBeforePrice(NumberUtil.div(item.getBeforeAmount(),
+                        item.getBeforeCount(), 2));
             }
 
             //本月消耗
             item.setCostCount(item.getBeforeCount() - item.getAfterCount());
             item.setCostPrice(item.getBeforePrice());
             Double amount = NumberUtil.round(
-                    NumberUtil.mul(item.getCostPrice().doubleValue() * item.getCostCount().doubleValue()),
+                    NumberUtil.mul(item.getCostPrice() * item.getCostCount()),
                     2).doubleValue();
             item.setCostAmount(amount);
 
@@ -59,6 +67,9 @@ public class ReportServiceImpl implements ReportService {
             item.setAfterAmount(item.getBeforeAmount() - item.getCostAmount());
             if(item.getAfterCount()==0 || item.getAfterAmount() ==0){
                 item.setAfterPrice(0D);
+            }else{
+                item.setAfterPrice(NumberUtil.div(item.getAfterAmount(),
+                        item.getAfterCount(), 2));
             }
 
             item.setYear(year);
@@ -69,8 +80,15 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public void resetStock() {
+    public String resetStock(Integer year, Integer month) {
+        List<StockMonth> errData = stockMonthMapper.findErrorData(year, month);
+        if(errData.size()>0){
+            return String.join(",", errData.stream().limit(10).map(item->item.getProductName()).collect(Collectors.toList()));
+        }
 
+        stockMapper.empty();
+        stockMapper.insertSelect(year, month);
+        return "ok";
     }
 
 

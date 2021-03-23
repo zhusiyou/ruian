@@ -21,4 +21,5 @@ public interface StockMapper {
     Integer exists(String productId);
     Stock findByProductId(String productId);
     int update(Stock stock);
+    int insertSelect(Integer year, Integer month);
 }

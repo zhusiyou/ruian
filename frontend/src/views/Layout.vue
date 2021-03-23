@@ -1,8 +1,9 @@
 <template>
   <a-layout id="components-layout-demo-top-side-2">
     <a-layout-header class="header">
-      <div class="logo" />
-      
+      <div class="logo">
+        <!-- <img src="/ruian.png" /> -->
+      </div>
     </a-layout-header>
     <a-layout>
       <a-layout-sider width="200" style="background: #fff">
@@ -36,7 +37,7 @@
         <a-sub-menu key="reportService">
           <template #title><span>财务报表</span></template>
           <a-menu-item key="income" @click="link('income')">应付款管理</a-menu-item>
-          <a-menu-item key="expend" @click="link('expend')">消耗管理</a-menu-item>
+          <a-menu-item key="cost" @click="link('cost')">消耗管理</a-menu-item>
         </a-sub-menu>
         </a-menu>
       </a-layout-sider>
@@ -96,8 +97,8 @@ export default {
 #components-layout-demo-top-side-2 .logo {
   width: 120px;
   height: 31px;
-  background: rgba(255, 255, 255, 0.2);
-  margin: 16px 28px 16px 0;
+  /* background: rgba(255, 255, 255, 0.2); */
+  /* margin: 16px 28px 16px 0; */
   float: left;
 }
 </style>
